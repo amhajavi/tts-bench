@@ -1,3 +1,4 @@
+import sys
 import click
 
 class MultipleArgsOption(click.Option):
@@ -10,14 +11,15 @@ class MultipleArgsOption(click.Option):
     def handle_parse_result(self, ctx, opts, args):
         # Check if our option flag is present in the unparsed arguments
         for opt_name in self.opts:
-            if opt_name in args:
+            argv = sys.argv
+            if opt_name in argv:
                 # Find where our option is located
-                idx = args.index(opt_name)
+                idx = argv.index(opt_name)
                 values = []
                 # Look ahead and consume all items that do not start with a dash
                 look_ahead = idx + 1
-                while look_ahead < len(args) and not args[look_ahead].startswith("-"):
-                    values.append(args[look_ahead])
+                while look_ahead < len(argv) and not argv[look_ahead].startswith("-"):
+                    values.append(argv[look_ahead])
                     
                     look_ahead += 1
                 
@@ -25,10 +27,6 @@ class MultipleArgsOption(click.Option):
                 # so Click doesn't treat them as positional arguments
                 del args[idx + 1 : look_ahead]
                 
-                # Update the opts dictionary with the found values
-                if self.name in opts:
-                    opts[self.name] = tuple(list(opts[self.name]) + values)
-                else:
-                    opts[self.name] = tuple(values)
+                opts[self.name] = tuple(values)
                     
         return super().handle_parse_result(ctx, opts, args)
