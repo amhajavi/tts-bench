@@ -1,5 +1,5 @@
 import click
-from tts_bench.cli import MultipleArgsOption
+from tts_bench.cli.multiple_args_option import MultipleArgsOption
 
 @click.group()
 def cli():
@@ -29,7 +29,6 @@ def version():
 def run(models, metrics, input, suit, output, remaining_args):
     click.echo(f'{(models)} models will be tested')
     click.echo(f'{(metrics)} metrics will be used to the test the models')
-    print(remaining_args)
     if suit:
         click.echo(f'The test will use the {suit} suit')
     elif input: 
