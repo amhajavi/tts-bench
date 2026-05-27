@@ -20,7 +20,10 @@ classifiers = [
     "Topic :: Multimedia :: Sound/Audio :: Speech",
 ]
 requires-python = ">=3.11"
-dependencies = []
+dependencies = [
+    "click>=8.4.1",
+    "numpy>=2.4.6",
+]
 
 [project.urls]
 Homepage = "https://github.com/amhajavi/tts-bench"
@@ -28,7 +31,7 @@ Repository = "https://github.com/amhajavi/tts-bench"
 Issues = "https://github.com/amhajavi/tts-bench/issues"
 
 [project.scripts]
-tts-bench = "tts_bench.cli:main"
+tts-bench = "tts_bench.cli.general:main"
 
 [build-system]
 requires = ["hatchling"]
