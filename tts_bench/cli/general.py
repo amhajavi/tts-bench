@@ -18,6 +18,8 @@ def version():
 
 @click.option("--metrics", '-M', cls=MultipleArgsOption, help="The list of metric for evaluation of the tts models.")
 
+@click.option("--voice-sample", '-v', default=None, help="The path to the file containing the text intended to test the tts models. *Ignored if a suit is selected.")
+
 @click.option("--input", '-i', default=None, help="The path to the file containing the text intended to test the tts models. *Ignored if a suit is selected.")
 
 @click.option("--suit", '-s', cls=MultipleArgsOption, help="The preset of test cases for evaluation of TTS models")
@@ -26,7 +28,7 @@ def version():
 
 @click.argument('remaining_args', nargs=-1)
 
-def run(models, metrics, input, suit, output, remaining_args):
+def run(models, metrics, voice_sample, input, suit, output, remaining_args):
     click.echo(f'{(models)} models will be tested')
     click.echo(f'{(metrics)} metrics will be used to the test the models')
     if suit:
