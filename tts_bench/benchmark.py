@@ -4,6 +4,7 @@ from pathlib import Path
 import numpy as np
 import torch
 import torchaudio
+from tqdm import tqdm
 
 from tts_bench.models import MODELS
 from tts_bench.metrics import METRICS
@@ -32,12 +33,12 @@ class Benchmark:
 
     def run(self, texts: list[str]) -> list[dict]:
         results = []
-        for model in self.models:
+        for model in tqdm(self.models, desc="Models"):
             row = {
                 "model": model.__class__.__name__,
                 "scores": {},
             }
-            for text in texts:
+            for text in tqdm(texts, desc=f"{model.__class__.__name__}", leave=False):
                 audio, sr = model.synthesize(text, voice_sample=self.voice_sample)
                 for metric in self.metrics:
                     score = metric.compute(audio, text)
