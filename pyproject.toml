@@ -22,7 +22,11 @@ classifiers = [
 requires-python = ">=3.11"
 dependencies = [
     "click>=8.4.1",
-    "numpy>=2.4.6",
+    "coqui-tts>=0.27.1",
+    "numpy==1.26.4",
+    "torch==2.5.0",
+    "torchaudio==2.5.0",
+    "transformers==4.56.0",
 ]
 
 [project.urls]
