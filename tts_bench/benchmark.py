@@ -26,14 +26,14 @@ class Benchmark:
         if unknown_metrics:
             raise ValueError(f"Unknown metric(s): {unknown_metrics}. Available: {list(METRICS)}")
 
-        self.models = [MODELS[n]() for n in model_names]
+        self.models = [MODELS[n]() for n in tqdm(model_names, desc="Loading the models")]
         self.metrics = [METRICS[n]() for n in metric_names]
         self.voice_sample = voice_sample
         self.demo_output_dir = Path(demo_output_dir) if demo_output_dir else None
 
     def run(self, texts: list[str]) -> list[dict]:
         results = []
-        for model in tqdm(self.models, desc="Models"):
+        for model in tqdm(self.models, desc="Speech Generation Models:"):
             row = {
                 "model": model.__class__.__name__,
                 "scores": {},
