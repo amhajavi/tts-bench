@@ -34,6 +34,7 @@ class Benchmark:
     def run(self, texts: list[str]) -> list[dict]:
         results = []
         for model in tqdm(self.models, desc="Speech Generation Models:"):
+            model.load_to_device()
             row = {
                 "model": model.__class__.__name__,
                 "scores": {},
@@ -48,7 +49,7 @@ class Benchmark:
                     row.setdefault("demo_audio", []).append(
                         str(self._save_audio(audio, sr, model.__class__.__name__, text))
                     )
-
+            model.unload_from_device()
             results.append(row)
         return results
 
