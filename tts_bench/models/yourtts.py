@@ -9,7 +9,7 @@ class YourTTSWrapper(BaseTTSModel):
     def __init__(self):
         super(YourTTSWrapper).__init__()
                 
-        self.tts_model = TTS("tts_models/multilingual/multi-dataset/your_tts").to(self.device)
+        self.tts_model = TTS("tts_models/multilingual/multi-dataset/your_tts")
     
     def synthesize(self, text, voice_sample=None, language="en", **kwargs):
         wav = self.tts_model.tts(text=text, speaker_wav=voice_sample, language=language)
