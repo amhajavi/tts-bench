@@ -6,11 +6,15 @@ class YourTTSWrapper(BaseTTSModel):
     
     sample_rate = 16000
     
-    def __init__(self):
+    def __init__(self, **kwargs):
         super(YourTTSWrapper).__init__()
                 
+        self.language = kwargs.get("language", "en")
         self.tts_model = TTS("tts_models/multilingual/multi-dataset/your_tts")
     
-    def synthesize(self, text, voice_sample=None, language="en", **kwargs):
-        wav = self.tts_model.tts(text=text, speaker_wav=voice_sample, language=language)
+    def synthesize(self, text, **kwargs):
+        
+        voice_sample = kwargs.get("vioce_sample", None)
+        
+        wav = self.tts_model.tts(text=text, speaker_wav=voice_sample, language=self.language)
         return wav, self.sample_rate
