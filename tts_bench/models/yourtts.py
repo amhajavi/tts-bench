@@ -14,7 +14,6 @@ class YourTTSWrapper(BaseTTSModel):
     
     def synthesize(self, text, **kwargs):
         
-        voice_sample = kwargs.get("vioce_sample", None)
-        
+        voice_sample = kwargs.get("voice_sample", None)
         wav = self.tts_model.tts(text=text, speaker_wav=voice_sample, language=self.language)
         return wav, self.sample_rate
