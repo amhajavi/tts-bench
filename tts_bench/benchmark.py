@@ -17,6 +17,8 @@ class Benchmark:
         metric_names: list[str],
         voice_sample: str = None,
         demo_output_dir: str = None,
+        language: str = "en",
+        kokoro_voice_identifier: str = 'af_heart',
     ):
         unknown_models = [n for n in model_names if n not in MODELS]
         if unknown_models:
@@ -26,10 +28,16 @@ class Benchmark:
         if unknown_metrics:
             raise ValueError(f"Unknown metric(s): {unknown_metrics}. Available: {list(METRICS)}")
 
-        self.models = [MODELS[n]() for n in tqdm(model_names, desc="Loading the models")]
+        self.models = [MODELS[n](language=language) for n in tqdm(model_names, desc="Loading the models")]
         self.metrics = [METRICS[n]() for n in metric_names]
         self.voice_sample = voice_sample
         self.demo_output_dir = Path(demo_output_dir) if demo_output_dir else None
+        self.kokoro_voice_identifier = kokoro_voice_identifier
+        
+        self.synthesizer_kwargs = {
+            "voice_sample": voice_sample,
+            "kokoro_voice_identifier": kokoro_voice_identifier,
+        }
 
     def run(self, texts: list[str]) -> list[dict]:
         results = []
@@ -40,7 +48,10 @@ class Benchmark:
                 "scores": {},
             }
             for text in tqdm(texts, desc=f"{model.__class__.__name__}", leave=False):
-                audio, sr = model.synthesize(text, voice_sample=self.voice_sample)
+                audio, sr = model.synthesize(
+                        text=text,
+                        **self.synthesizer_kwargs,
+                    )
                 for metric in self.metrics:
                     score = metric.compute(audio, text)
                     row["scores"].setdefault(metric.__class__.__name__, []).append(score)
