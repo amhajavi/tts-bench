@@ -15,7 +15,10 @@ class KokoroWrapper(BaseTTSModel):
     def __init__(self, **kwargs):
         super(KokoroWrapper).__init__()
         self.language = kwargs.get("language", "en")
-        self.tts_model = KPipeline(lang_code=language_codes[self.language])
+        self.tts_model = KPipeline(
+                repo_id="hexgrad/Kokoro-82M",
+                lang_code=language_codes[self.language]
+            )
         
     def synthesize(self, text, **kwargs):
         voice_identifier = kwargs.get("kokoro_voice_identifier", None)
