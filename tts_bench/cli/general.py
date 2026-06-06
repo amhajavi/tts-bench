@@ -22,12 +22,13 @@ def version():
 @click.option("--metrics", '-M', cls=MultipleArgsOption, help="The list of metrics for evaluation of the tts models.")
 @click.option("--voice-sample", '-v', default=None, help="Path to a voice sample file for models that require one.")
 @click.option("--kokoro-voice-identifier", '-kv', default='af_heart', help="Identifier for Kokoro Voice.")
+@click.option("--vits-speaker", '-vts', default='p225', help="Identifier for Kokoro Voice.")
 @click.option("--input", '-i', default=None, help="Path to a text file to use as input. Ignored if a suite is selected.")
 @click.option("--suit", '-s', default=None, help="Name of a built-in test suite.")
 @click.option("--output", '-o', default='output.html', help="Path to the output report file.")
 @click.option("--demo-output", '-d', default=None, metavar="DIR", help="Save raw audio output under DIR/<model>/<text>.wav for demo comparison.")
 @click.argument('remaining_args', nargs=-1)
-def run(models, metrics, voice_sample, kokoro_voice_identifier, input, suit, output, demo_output, remaining_args):
+def run(models, metrics, voice_sample, kokoro_voice_identifier, vits_speaker, input, suit, output, demo_output, remaining_args):
     if suit:
         texts = load_suite(suit)
     elif input:
@@ -42,7 +43,8 @@ def run(models, metrics, voice_sample, kokoro_voice_identifier, input, suit, out
                 metric_names=list(metrics), 
                 voice_sample=voice_sample,
                 kokoro_voice_identifier=kokoro_voice_identifier,
-                demo_output_dir=demo_output
+                demo_output_dir=demo_output,
+                vits_speaker=vits_speaker,
             )
     except ValueError as e:
         raise click.BadParameter(str(e))
