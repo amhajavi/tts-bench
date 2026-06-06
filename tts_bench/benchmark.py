@@ -19,6 +19,7 @@ class Benchmark:
         demo_output_dir: str = None,
         language: str = "en",
         kokoro_voice_identifier: str = 'af_heart',
+        vits_speaker: str = "p225",
     ):
         unknown_models = [n for n in model_names if n not in MODELS]
         if unknown_models:
@@ -33,10 +34,12 @@ class Benchmark:
         self.voice_sample = voice_sample
         self.demo_output_dir = Path(demo_output_dir) if demo_output_dir else None
         self.kokoro_voice_identifier = kokoro_voice_identifier
+        self.vits_speaker = vits_speaker
         
         self.synthesizer_kwargs = {
             "voice_sample": voice_sample,
             "kokoro_voice_identifier": kokoro_voice_identifier,
+            "vits-speaker": vits_speaker, 
         }
 
     def run(self, texts: list[str]) -> list[dict]:
