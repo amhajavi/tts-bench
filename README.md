@@ -14,7 +14,7 @@ pip install tts-bench
 
 Evaluating TTS models is surprisingly painful. You either write one-off scripts per model, cobble together separate tools for each metric, or rely on benchmarks that are years out of date. `tts-bench` fixes that:
 
-- **One interface for all models** — open-source (Kokoro, XTTS, Parler) and API-based (ElevenLabs, OpenAI) share the same evaluation API
+- **One interface for all models** — open-source (Kokoro, XTTS, YourTTS, VITS) and API-based (ElevenLabs, OpenAI) share the same evaluation API
 - **Pick your metrics** — choose from a comprehensive library of intelligibility, naturalness, prosody, speaker, and signal metrics
 - **Human-readable output** — an HTML report with inline audio playback so you can *hear* the differences, not just read numbers
 - **Reproducible by default** — every run is logged with model versions, inputs, and environment info
@@ -47,7 +47,7 @@ results.save_report("report.html")
 from tts_bench import compare
 
 report = compare(
-    models=["kokoro", "xtts"],
+    models=["kokoro", "vits"],
     texts="my_eval_texts.txt",  # one sentence per line
     metrics=["wer", "cer", "utmos", "speaker_sim", "stress_pass_rate"]
 )
@@ -58,7 +58,7 @@ print(report.summary())
 
 ```
 ┌──────────────────────┬────────┬────────┐
-│ Metric               │ Kokoro │ XTTS   │
+│ Metric               │ Kokoro │ VITS   │
 ├──────────────────────┼────────┼────────┤
 │ WER ↓                │ 0.031  │ 0.048  │
 │ CER ↓                │ 0.018  │ 0.031  │
@@ -71,7 +71,7 @@ print(report.summary())
 ### Run from the command line
 
 ```bash
-tts-bench run --models kokoro xtts --metrics wer utmos speaker_sim --input texts.txt --output report.html
+tts-bench run --models kokoro vits --metrics wer utmos speaker_sim --input texts.txt --output report.html
 ```
 
 ---
@@ -201,20 +201,31 @@ results = evaluate(model="kokoro", texts=load_suite("my_suite.txt"), metrics="st
 
 ## Supported Models
 
+> **System requirement:** `espeak-ng` must be installed before using any local model.
+> - Ubuntu/Debian: `sudo apt-get install espeak-ng`
+> - macOS: `brew install espeak-ng`
+> - Windows: `winget install espeak-ng`
+
 ### Open-Source (local inference)
-| Model | Status |
-|---|---|
-| Kokoro | ✅ Supported |
-| XTTS v2 | ✅ Supported |
-| Parler TTS | 🔜 Coming soon |
-| StyleTTS2 | 🔜 Coming soon |
+
+| Model | Key | Character | Status |
+|---|---|---|---|
+| Kokoro-82M | `kokoro` | Lightweight, modern, Apache 2.0 | ✅ Supported |
+| XTTS v2 | `xtts` | Multilingual (17 langs), voice cloning | ✅ Supported |
+| YourTTS | `yourtts` | Zero-shot voice cloning from 3s clip | ✅ Supported |
+| VITS (VCTK) | `vits` | Deterministic, 109 English speakers | ✅ Supported |
+| Parler TTS | `parler` | Prompted style control | 🔜 Coming soon |
+| StyleTTS2 | `styletts2` | High naturalness, style transfer | 🔜 Coming soon |
+
+XTTS, YourTTS, and VITS are all available via the `coqui-tts` package. Kokoro uses the `kokoro` package.
 
 ### API-based
-| Provider | Status |
-|---|---|
-| ElevenLabs | 🔜 Coming soon |
-| OpenAI TTS | 🔜 Coming soon |
-| Cartesia | 🔜 Coming soon |
+
+| Provider | Key | Status |
+|---|---|---|
+| ElevenLabs | `elevenlabs` | 🔜 Coming soon |
+| OpenAI TTS | `openai` | 🔜 Coming soon |
+| Cartesia | `cartesia` | 🔜 Coming soon |
 
 Want a model added? [Open an issue](https://github.com/amhajavi/tts-bench/issues).
 
