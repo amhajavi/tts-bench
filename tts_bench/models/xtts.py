@@ -1,5 +1,7 @@
 from tts_bench.models.base import BaseTTSModel
 
+import torch
+
 from TTS.api import TTS
 
 class XTTSWrapper(BaseTTSModel):
@@ -18,4 +20,7 @@ class XTTSWrapper(BaseTTSModel):
         voice_sample = kwargs.get("voice_sample", None)
         
         wav = self.tts_model.tts(text=text, speaker_wav=voice_sample, language=self.language)
+        
+        wav = torch.tensor(wav)
+        
         return wav, self.sample_rate

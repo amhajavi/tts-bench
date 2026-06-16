@@ -1,4 +1,5 @@
 from tts_bench.models.base import BaseTTSModel
+import torch
 
 from TTS.api import TTS
 
@@ -18,4 +19,7 @@ class VITSWrapper(BaseTTSModel):
         vits_speaker = kwargs.get("vits-speaker", None)
         
         wav = self.tts_model.tts(text=text, speaker=vits_speaker)
+        
+        wav = torch.tensor(wav)
+        
         return wav, self.sample_rate
