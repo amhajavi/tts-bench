@@ -56,7 +56,7 @@ class Benchmark:
                         **self.synthesizer_kwargs,
                     )
                 for metric in self.metrics:
-                    score = metric.compute(audio, text)
+                    score = metric.compute(audio, text, sr=sr)
                     row["scores"].setdefault(metric.__class__.__name__, []).append(score)
 
                 if self.demo_output_dir is not None:
