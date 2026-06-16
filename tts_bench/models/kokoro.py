@@ -1,5 +1,5 @@
 from tts_bench.models.base import BaseTTSModel
-
+import torch
 from kokoro import KPipeline
 
 language_codes = {
@@ -28,6 +28,7 @@ class KokoroWrapper(BaseTTSModel):
         
         for i, (gs, ps, audio) in enumerate(generator):
             wav += audio
+        wav = torch.tensor(wav)
         return wav, self.sample_rate
     
     def load_to_device(self):
