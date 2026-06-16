@@ -13,7 +13,7 @@ class WER(BaseMetric):
     def compute(self, audio:np.ndarray, text: str, reference: np.ndarray = None, sr: int = 16000) -> float:
         # every metric must have this implemented
         # Transcribe audio using faster-whisper
-        audio = np.reshape(audio, (-1,))
+        audio = np.reshape(audio.numpy(), (-1,))
         segments, _ = model.transcribe(audio,  language="en")
         transcription = " ".join([segment.text for segment in segments])
         
@@ -28,7 +28,7 @@ class CER(BaseMetric):
     
     def compute(self, audio:np.ndarray, text: str, reference: np.ndarray = None, sr: int = 16000) -> float:
         # Transcribe audio using faster-whisper
-        audio = np.reshape(audio, (-1,))
+        audio = np.reshape(audio.numpy(), (-1,))
         segments, _ = model.transcribe(audio,  language="en")
         transcription = " ".join([segment.text for segment in segments])    
         # Compute CER between transcription and reference text
