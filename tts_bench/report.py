@@ -5,11 +5,9 @@ def generate_report(results: list[dict], output_path: str) -> None:
     for row in results:
         lines.append(f"<h2>{row['model']}</h2>")
         lines.append("<ul>")
-        scores = []
         for metric, score in row["scores"].items():
             lines.append(f"  <li>{metric}: {score}</li>")
-            scores.append(score)
-        lines.append(f"  <li> Average: {np.mean(scores)}</li>")
+            lines.append(f"  <li> Average: {np.mean(score)}</li>")
         lines.append("</ul>")
         
     lines.append("</body></html>")
