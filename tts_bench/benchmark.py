@@ -7,6 +7,7 @@ import torchaudio
 from tqdm import tqdm
 
 from tts_bench.models import MODELS
+from tts_bench.models.loader import load_custom_model
 from tts_bench.metrics import METRICS
 
 
@@ -20,16 +21,22 @@ class Benchmark:
         language: str = "en",
         kokoro_voice_identifier: str = 'af_heart',
         vits_speaker: str = "p225",
+        custom_model_paths: list[str] = None,
     ):
-        unknown_models = [n for n in model_names if n not in MODELS]
+        registry = dict(MODELS)
+        for spec in (custom_model_paths or []):
+            name, cls = load_custom_model(spec)
+            registry[name] = cls
+
+        unknown_models = [n for n in model_names if n not in registry]
         if unknown_models:
-            raise ValueError(f"Unknown model(s): {unknown_models}. Available: {list(MODELS)}")
+            raise ValueError(f"Unknown model(s): {unknown_models}. Available: {list(registry)}")
 
         unknown_metrics = [n for n in metric_names if n not in METRICS]
         if unknown_metrics:
             raise ValueError(f"Unknown metric(s): {unknown_metrics}. Available: {list(METRICS)}")
 
-        self.models = [MODELS[n](language=language) for n in tqdm(model_names, desc="Loading the models")]
+        self.models = [registry[n](language=language) for n in tqdm(model_names, desc="Loading the models")]
         self.metrics = [METRICS[n]() for n in metric_names]
         self.voice_sample = voice_sample
         self.demo_output_dir = Path(demo_output_dir) if demo_output_dir else None
