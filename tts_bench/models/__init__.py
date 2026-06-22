@@ -1,3 +1,4 @@
+from tts_bench.models.base import BaseTTSModel
 from tts_bench.models.xtts import XTTSWrapper
 from tts_bench.models.yourtts import YourTTSWrapper
 from tts_bench.models.kokoro import KokoroWrapper
