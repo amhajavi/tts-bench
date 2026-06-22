@@ -57,16 +57,25 @@ class Benchmark:
                 "model": model.__class__.__name__,
                 "scores": {},
             }
+
+            audio_outputs = []
+
             for text in tqdm(texts, desc=f"{model.__class__.__name__}", leave=False):
                 audio, sr = model.synthesize(
                         text=text,
                         **self.synthesizer_kwargs,
                     )
-                for metric in self.metrics:
+                audio_outputs.append((audio, sr, text))
+    
+            for metric in tqdm(self.metrics, desc=f"{model.__class__.__name__}", leave=False):
+                metric.load_to_device()
+                for audio, sr, text in audio_outputs:
                     score = metric.compute(audio, text, sr=sr)
                     row["scores"].setdefault(metric.__class__.__name__, []).append(score)
+                metric.unload_from_device()
 
-                if self.demo_output_dir is not None:
+            if self.demo_output_dir is not None:
+                for audio, sr, text in audio_outputs:
                     row.setdefault("demo_audio", []).append(
                         str(self._save_audio(audio, sr, model.__class__.__name__, text))
                     )
