@@ -14,5 +14,5 @@ class UTMOSV2(BaseMetric):
         # Transcribe audio using faster-whisper
         audio = np.reshape(audio, (1,-1,))
         
-        return model.predict(data=audio, sr=int(sr))
+        return model.predict(data=audio, sr=int(sr)).cpu().numpy()[0]
 
