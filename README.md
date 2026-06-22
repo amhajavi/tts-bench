@@ -199,6 +199,83 @@ results = evaluate(model="kokoro", texts=load_suite("my_suite.txt"), metrics="st
 
 ---
 
+## Custom Models
+
+You can benchmark any TTS model — not just the built-in ones — by subclassing `BaseTTSModel` and passing your class directly to `evaluate` or `compare`.
+
+### How a custom model file should look
+
+```python
+# my_model.py
+import numpy as np
+from tts_bench.models import BaseTTSModel
+
+
+class MyCustomModel(BaseTTSModel):
+
+    sample_rate = 22050  # output sample rate in Hz
+
+    def __init__(self, **kwargs):
+        super().__init__()
+        # load your model weights / initialize your API client here
+
+    def synthesize(self, text: str, **kwargs) -> tuple[np.ndarray, int]:
+        """
+        Must return a tuple of (audio_samples, sample_rate).
+        audio_samples — 1-D float32 numpy array of PCM audio.
+        sample_rate   — integer sample rate in Hz.
+        """
+        # replace with your actual synthesis call
+        samples = np.zeros(self.sample_rate * 1, dtype=np.float32)
+        return samples, self.sample_rate
+```
+
+**Rules:**
+- Subclass `tts_bench.models.BaseTTSModel`.
+- Set the `sample_rate` class attribute to match your model's output.
+- Implement `synthesize(text, **kwargs)` and return `(np.ndarray, int)`.
+- Optionally override `load_to_device()` / `unload_from_device()` if your model uses PyTorch and you want automatic GPU memory management during multi-model runs.
+
+### Usage
+
+```python
+from tts_bench import evaluate, compare
+from my_model import MyCustomModel
+
+# Evaluate a single custom model
+results = evaluate(
+    model=MyCustomModel(),
+    texts=[
+        "The quick brown fox jumps over the lazy dog.",
+        "She has a PhD from MIT.",
+    ],
+    metrics=["wer", "utmos"]
+)
+results.save_report("report.html")
+
+# Compare a custom model against a built-in one
+report = compare(
+    models=[MyCustomModel(), "kokoro"],
+    texts="eval_texts.txt",
+    metrics="standard"
+)
+print(report.summary())
+```
+
+You can also use a custom model from the CLI with `--custom-model <file>::<ClassName>`:
+
+```bash
+tts-bench run \
+  --custom-model my_model.py::SilentModel \
+  --models SilentModel \
+  --metrics wer utmosv2 \
+  --suit stress_test
+```
+
+`--custom-model` registers the class from the given file, and `--models` then refers to it by class name alongside any built-in model keys.
+
+---
+
 ## Supported Models
 
 > **System requirement:** `espeak-ng` must be installed before using any local model.
