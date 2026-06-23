@@ -19,7 +19,7 @@ class UTMOSV2(BaseMetric):
         # Transcribe audio using faster-whisper
         audio = np.reshape(audio, (1,-1,))
         
-        return self.model.predict(data=audio, sr=int(sr)).cpu().numpy()[0]
+        return self.model.predict(data=audio, sr=int(sr), verbose=False).cpu().numpy()[0]
 
     def load_to_device(self, device: str = "cuda"):
         self.model = utmosv2.create_model(pretrained=True, device=device)
