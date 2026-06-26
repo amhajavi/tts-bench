@@ -217,3 +217,8 @@ __marimo__/
 # Streamlit
 .streamlit/secrets.toml
 output.html
+
+
+# Model checkpoints
+pretrained_models/
+*.ckpt
