@@ -51,7 +51,8 @@ class Benchmark:
 
     def run(self, texts: list[str]) -> list[dict]:
         results = []
-        for model in tqdm(self.models, desc="Speech Generation Models:"):
+        for model in self.models:
+            print(f"\033[92m{model.__class__.__name__}\033[0m")
             model.load_to_device()
             row = {
                 "model": model.__class__.__name__,
@@ -60,22 +61,22 @@ class Benchmark:
 
             audio_outputs = []
 
-            for text in tqdm(texts, desc=f"{model.__class__.__name__}", leave=False):
+            for text in tqdm(texts, desc=f"Generating audio for {model.__class__.__name__}"):
                 audio, sr = model.synthesize(
                         text=text,
                         **self.synthesizer_kwargs,
                     )
                 audio_outputs.append((audio, sr, text))
     
-            for metric in tqdm(self.metrics, desc=f"{model.__class__.__name__}", leave=False):
+            for metric in tqdm(self.metrics, desc=f"Evaluating metrics for {model.__class__.__name__}"):
                 metric.load_to_device()
-                for audio, sr, text in audio_outputs:
+                for audio, sr, text in tqdm(audio_outputs, desc=f"Computing {metric.__class__.__name__} for {model.__class__.__name__}", leave=False):
                     score = metric.compute(audio, text, sr=sr)
                     row["scores"].setdefault(metric.__class__.__name__, []).append(score)
                 metric.unload_from_device()
 
             if self.demo_output_dir is not None:
-                for audio, sr, text in audio_outputs:
+                for audio, sr, text in tqdm(audio_outputs, desc=f"Saving audio for {model.__class__.__name__}"):
                     row.setdefault("demo_audio", []).append(
                         str(self._save_audio(audio, sr, model.__class__.__name__, text))
                     )
