@@ -71,7 +71,7 @@ class Benchmark:
             for metric in tqdm(self.metrics, desc=f"Evaluating metrics for {model.__class__.__name__}"):
                 metric.load_to_device()
                 for audio, sr, text in tqdm(audio_outputs, desc=f"Computing {metric.__class__.__name__} for {model.__class__.__name__}", leave=False):
-                    score = metric.compute(audio, text, sr=sr)
+                    score = metric.compute(audio, text, sr=sr, reference=self.voice_sample)
                     row["scores"].setdefault(metric.__class__.__name__, []).append(score)
                 metric.unload_from_device()
 
