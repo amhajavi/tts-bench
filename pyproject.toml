@@ -27,6 +27,7 @@ dependencies = [
     "jiwer>=4.0.0",
     "kokoro>=0.9.4",
     "numpy==1.26.4",
+    "speechbrain>=1.1.0",
     "torch==2.6.0",
     "torchaudio==2.6.0",
     "torchmetrics[audio]>=1.9.0",
