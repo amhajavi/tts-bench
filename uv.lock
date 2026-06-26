@@ -1168,6 +1168,20 @@ http = [
 ]
 
 [[package]]
+name = "gammatone"
+version = "1.0.3"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "matplotlib" },
+    { name = "numpy" },
+    { name = "scipy" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/ad/f8/64317ea26ee2931c3f3b6ec8417a1f99c268d01bc11f43079a469edfe453/gammatone-1.0.3.tar.gz", hash = "sha256:fc990f5e3ee5cd48bdfac215003e31aa5777d82360fd2914500667e62e3a2c16", size = 12947, upload-time = "2024-09-10T13:42:07.939Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/de/37/9beb1eec3e3a62e3da9128a83d78516f5d911009f5e3b7ebf6fea19f9ebc/Gammatone-1.0.3-py3-none-any.whl", hash = "sha256:410a07344bacac651c3d8d466e25888e1925f00458f054871485c0aa22d78061", size = 15023, upload-time = "2024-09-10T13:42:06.547Z" },
+]
+
+[[package]]
 name = "grpcio"
 version = "1.80.0"
 source = { registry = "https://pypi.org/simple" }
@@ -1636,6 +1650,19 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/64/36/360b5aafa0238e29758729e9486c6ed92a6f37fa403b7875e06c115cdf4a/librosa-0.11.0.tar.gz", hash = "sha256:f5ed951ca189b375bbe2e33b2abd7e040ceeee302b9bbaeeffdfddb8d0ace908", size = 327001, upload-time = "2025-03-11T15:09:54.884Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/b5/ba/c63c5786dfee4c3417094c4b00966e61e4a63efecee22cb7b4c0387dda83/librosa-0.11.0-py3-none-any.whl", hash = "sha256:0b6415c4fd68bff4c29288abe67c6d80b587e0e1e2cfb0aad23e4559504a7fa1", size = 260749, upload-time = "2025-03-11T15:09:52.982Z" },
+]
+
+[[package]]
+name = "lightning-utilities"
+version = "0.15.3"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "packaging" },
+    { name = "typing-extensions" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/f1/45/7fa8f56b17dc0f0a41ec70dd307ecd6787254483549843bef4c30ab5adce/lightning_utilities-0.15.3.tar.gz", hash = "sha256:792ae0204c79f6859721ac7f386c237a33b0ed06ba775009cb894e010a842033", size = 33553, upload-time = "2026-02-22T14:48:53.348Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/25/f4/ead6e0e37209b07c9baa3e984ccdb0348ca370b77cea3aaea8ddbb097e00/lightning_utilities-0.15.3-py3-none-any.whl", hash = "sha256:6c55f1bee70084a1cbeaa41ada96e4b3a0fea5909e844dd335bd80f5a73c5f91", size = 31906, upload-time = "2026-02-22T14:48:52.488Z" },
 ]
 
 [[package]]
@@ -2386,6 +2413,12 @@ wheels = [
 ]
 
 [[package]]
+name = "pesq"
+version = "0.0.4"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/22/e6/f8bdcef3238ac10fb3ce37d150e9b03a152d971febd681f088c6e5e17d8e/pesq-0.0.4.tar.gz", hash = "sha256:b724b28f73fb638522982bd68e8c3c0957e2f45210639a460233b17aa7fc890b", size = 38702, upload-time = "2022-05-17T14:15:26.301Z" }
+
+[[package]]
 name = "phonemizer-fork"
 version = "3.3.2"
 source = { registry = "https://pypi.org/simple" }
@@ -2867,6 +2900,19 @@ version = "0.3.4"
 source = { registry = "https://pypi.org/simple" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/48/0a/c99fb7d7e176f8b176ef19704a32e6a9c6aafdf19ef75a187f701fc15801/pysbd-0.3.4-py3-none-any.whl", hash = "sha256:cd838939b7b0b185fcf86b0baf6636667dfb6e474743beeff878e9f42e022953", size = 71082, upload-time = "2021-02-11T16:36:33.351Z" },
+]
+
+[[package]]
+name = "pystoi"
+version = "0.4.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "numpy" },
+    { name = "scipy" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/bf/3d/1ae8bdb686c6aaaeef474aa6b790abbe38f42b61188b57a974dd9320e521/pystoi-0.4.1.tar.gz", hash = "sha256:1c6f50d6fbfee46b00c922458cdbd27228d9830ca81cea788fd600fc2f7de6e4", size = 10401, upload-time = "2023-12-29T16:48:05.726Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/1a/22/60cd92bd3ec00948800984410f4cf5ded5bd8e9b715729f3642efe0edb3d/pystoi-0.4.1-py2.py3-none-any.whl", hash = "sha256:e277b671663d26d35a2416c9c8010a74084e6c3970354506398051a554896939", size = 8218, upload-time = "2023-12-29T16:48:03.748Z" },
 ]
 
 [[package]]
@@ -4000,6 +4046,32 @@ wheels = [
 ]
 
 [[package]]
+name = "torchmetrics"
+version = "1.9.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "lightning-utilities" },
+    { name = "numpy" },
+    { name = "packaging" },
+    { name = "torch" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/81/34/39b8b749333db56c0585d7a11fa62a283c087bb1dfc897d69fb8cedbefb1/torchmetrics-1.9.0.tar.gz", hash = "sha256:a488609948600df52d3db4fcdab02e62aab2a85ef34da67037dc3e65b8512faa", size = 581765, upload-time = "2026-03-09T17:41:22.443Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/c3/a2/c7f6ebf546f8f644edf0f999aa98ece106986a77a7b922316bf6414ff825/torchmetrics-1.9.0-py3-none-any.whl", hash = "sha256:bfdcbff3dd1d96b3374bb2496eb39f23c4b28b8a845b6a18c313688e0d2d9ca1", size = 983384, upload-time = "2026-03-09T17:41:19.756Z" },
+]
+
+[package.optional-dependencies]
+audio = [
+    { name = "gammatone" },
+    { name = "librosa" },
+    { name = "onnxruntime" },
+    { name = "pesq" },
+    { name = "pystoi" },
+    { name = "requests" },
+    { name = "torchaudio" },
+]
+
+[[package]]
 name = "torchvision"
 version = "0.21.0"
 source = { registry = "https://pypi.org/simple" }
@@ -4082,6 +4154,7 @@ dependencies = [
     { name = "numpy" },
     { name = "torch" },
     { name = "torchaudio" },
+    { name = "torchmetrics", extra = ["audio"] },
     { name = "transformers" },
     { name = "utmosv2" },
 ]
@@ -4096,6 +4169,7 @@ requires-dist = [
     { name = "numpy", specifier = "==1.26.4" },
     { name = "torch", specifier = "==2.6.0" },
     { name = "torchaudio", specifier = "==2.6.0" },
+    { name = "torchmetrics", extras = ["audio"], specifier = ">=1.9.0" },
     { name = "transformers", specifier = "==4.56.0" },
     { name = "utmosv2", git = "https://github.com/sarulab-speech/UTMOSv2.git" },
 ]
