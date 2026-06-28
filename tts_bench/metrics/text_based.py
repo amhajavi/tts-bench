@@ -4,6 +4,10 @@ import numpy as np
 from faster_whisper import WhisperModel
 from tts_bench.metrics.base import BaseMetric
 from jiwer import wer as compute_wer, cer as compute_cer
+from tts_bench.utils.handle_money_problems import (
+    strip_commas_in_numbers,
+    compute_best_dollar_aware_error,
+)
 
 class WER(BaseMetric):
     
@@ -20,9 +24,12 @@ class WER(BaseMetric):
         audio = np.reshape(audio.numpy(), (-1,))
         segments, _ = self.model.transcribe(audio,  language="en")
         transcription = " ".join([segment.text for segment in segments])
-        
-        # Compute WER between transcription and reference text
-        error_rate = compute_wer(text, transcription)
+        # Remove commas inside numbers from both reference and transcription
+        clean_ref = strip_commas_in_numbers(text)
+        clean_trans = strip_commas_in_numbers(transcription)
+
+        # Compute WER between transcription and reference text, using dollar-aware comparisons
+        error_rate = compute_best_dollar_aware_error(clean_ref, clean_trans, compute_wer)
         return error_rate
 
     def load_to_device(self, device: str = "cuda"):
@@ -46,8 +53,11 @@ class CER(BaseMetric):
         audio = np.reshape(audio.numpy(), (-1,))
         segments, _ = self.model.transcribe(audio,  language="en")
         transcription = " ".join([segment.text for segment in segments])    
-        # Compute CER between transcription and reference text
-        error_rate = compute_cer(text, transcription)
+        # Remove commas inside numbers from both reference and transcription
+        clean_ref = strip_commas_in_numbers(text)
+        clean_trans = strip_commas_in_numbers(transcription)
+        # Compute CER between transcription and reference text, using dollar-aware comparisons
+        error_rate = compute_best_dollar_aware_error(clean_ref, clean_trans, compute_cer)
         return error_rate
     
     def load_to_device(self, device: str = "cuda"):
