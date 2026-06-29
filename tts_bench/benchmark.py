@@ -70,16 +70,20 @@ class Benchmark:
     
             for metric in tqdm(self.metrics, desc=f"Evaluating metrics for {model.__class__.__name__}"):
                 metric.load_to_device()
-                for audio, sr, text in tqdm(audio_outputs, desc=f"Computing {metric.__class__.__name__} for {model.__class__.__name__}", leave=False):
+                all_scores = []
+                for index, (audio, sr, text) in enumerate(tqdm(audio_outputs, desc=f"Computing {metric.__class__.__name__} for {model.__class__.__name__}", leave=False)):
                     score = metric.compute(audio, text, sr=sr, reference=self.voice_sample)
-                    row["scores"].setdefault(metric.__class__.__name__, []).append(score)
+                    row["scores"].setdefault(metric.__class__.__name__, {}).update({index: score})
+                    score = np.reshape(score, (1,-1,))
+                    all_scores+= [score]
+                row["scores"][metric.__class__.__name__]["all"] = np.mean(all_scores), np.std(all_scores)
+
+                
                 metric.unload_from_device()
 
             if self.demo_output_dir is not None:
-                for audio, sr, text in tqdm(audio_outputs, desc=f"Saving audio for {model.__class__.__name__}"):
-                    row.setdefault("demo_audio", []).append(
-                        str(self._save_audio(audio, sr, model.__class__.__name__, text))
-                    )
+                for index, (audio, sr, text) in enumerate(tqdm(audio_outputs, desc=f"Saving audio for {model.__class__.__name__}")):
+                    row.setdefault("demo_audio", {}).update({index: str(self._save_audio(audio, sr, model.__class__.__name__, text))})
             model.unload_from_device()
             results.append(row)
         return results
@@ -89,7 +93,7 @@ class Benchmark:
         filename = re.sub(r"[^\w\s-]", "", snippet).strip()
         filename = re.sub(r"\s+", "_", filename) or "audio"
 
-        out_dir = self.demo_output_dir / model_name
+        out_dir = self.demo_output_dir / "assets" / model_name
         out_dir.mkdir(parents=True, exist_ok=True)
         out_path = out_dir / f"{filename}.wav"
 
