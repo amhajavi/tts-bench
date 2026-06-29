@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ results.model }} - TTS Model Report</title>
+    <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>📊 {{ results.model }} - TTS Model Report</h1>
+
+        <!-- Metrics Table -->
+        <div class="metrics-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Metric</th>
+                        <th>Score</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for metric, score in results.scores.items() %}
+                    <tr>
+                        <td>{{ metric }}</td>
+                        <td class="metric-value">{{ "%.4f"|format(score.all[0]) }} ± {{ "%.4f"|format(score.all[1]) }}</td>
+                        <td>Complete</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Audio Files Section -->
+        <div class="audio-section">
+            <h2>🎵 Generated Audio Samples</h2>
+            <div class="audio-cards">
+                <!-- Card 1 -->
+                <div class="audio-card">
+                    <div class="card-header">
+                        <h3>Sample 1</h3>
+                        <p>Neutral Tone</p>
+                    </div>
+                    <div class="card-body">
+                        <audio class="audio-player" controls>
+                            <source src="" type="audio/wav">
+                            Your browser does not support the audio element.
+                        </audio>
+                        <p class="card-text">A neutral reading of the test phrase with clear pronunciation.</p>
+                        <div class="card-meta">
+                            <span>Duration: 3.2s</span>
+                            <span>Quality: 44.1kHz</span>
+                        </div>
+                        <span class="badge">Standard</span>
+                    </div>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="audio-card">
+                    <div class="card-header">
+                        <h3>Sample 2</h3>
+                        <p>Emotional Tone</p>
+                    </div>
+                    <div class="card-body">
+                        <audio class="audio-player" controls>
+                            <source src="" type="audio/wav">
+                            Your browser does not support the audio element.
+                        </audio>
+                        <p class="card-text">An emotionally expressive version with varied prosody.</p>
+                        <div class="card-meta">
+                            <span>Duration: 3.5s</span>
+                            <span>Quality: 44.1kHz</span>
+                        </div>
+                        <span class="badge">Premium</span>
+                    </div>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="audio-card">
+                    <div class="card-header">
+                        <h3>Sample 3</h3>
+                        <p>Fast Speech</p>
+                    </div>
+                    <div class="card-body">
+                        <audio class="audio-player" controls>
+                            <source src="" type="audio/wav">
+                            Your browser does not support the audio element.
+                        </audio>
+                        <p class="card-text">Accelerated speech with natural intonation preserved.</p>
+                        <div class="card-meta">
+                            <span>Duration: 2.1s</span>
+                            <span>Quality: 44.1kHz</span>
+                        </div>
+                        <span class="badge">Fast</span>
+                    </div>
+                </div>
+
+                <!-- Card 4 -->
+                <div class="audio-card">
+                    <div class="card-header">
+                        <h3>Sample 4</h3>
+                        <p>Slow Speech</p>
+                    </div>
+                    <div class="card-body">
+                        <audio class="audio-player" controls>
+                            <source src="" type="audio/wav">
+                            Your browser does not support the audio element.
+                        </audio>
+                        <p class="card-text">Slow, deliberate speech for clarity and understanding.</p>
+                        <div class="card-meta">
+                            <span>Duration: 4.8s</span>
+                            <span>Quality: 44.1kHz</span>
+                        </div>
+                        <span class="badge">Clarity</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer class="footer">
+            <p>© 2024 TTS Benchmark Report • Generated with precision and care</p>
+        </footer>
+    </div>
+</body>
+</html>
