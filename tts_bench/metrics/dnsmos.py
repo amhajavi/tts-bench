@@ -17,7 +17,7 @@ class DNSMOS(BaseMetric):
         # Transcribe audio using faster-whisper
         audio = np.reshape(audio, (1,-1,))
         
-        return deep_noise_suppression_mean_opinion_score(preds=audio, fs=int(sr), personalized=False, device=self.device).cpu().numpy()[0]
+        return deep_noise_suppression_mean_opinion_score(preds=audio, fs=int(sr), personalized=False, device=self.device).cpu().numpy()[0][0]
 
     def load_to_device(self, device: str = "cuda"):
         self.device = device
