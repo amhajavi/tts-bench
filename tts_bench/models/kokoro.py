@@ -10,6 +10,7 @@ language_codes = {
 
 class KokoroWrapper(BaseTTSModel):
     
+    name = "Kokoro"
     sample_rate = 24000
     
     def __init__(self, **kwargs):

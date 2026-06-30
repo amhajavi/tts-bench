@@ -6,6 +6,7 @@ from TTS.api import TTS
 
 class XTTSWrapper(BaseTTSModel):
     
+    name = "XTTS"
     sample_rate = 24000
     
     def __init__(self, **kwargs):

@@ -4,6 +4,7 @@ import numpy as np
 
 class BaseTTSModel:
     
+    name = "BaseTTSModel"
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     tts_model = None
     

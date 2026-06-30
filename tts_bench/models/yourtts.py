@@ -4,6 +4,7 @@ from TTS.api import TTS
 import torch
 class YourTTSWrapper(BaseTTSModel):
     
+    name = "YourTTS"
     sample_rate = 16000
     
     def __init__(self, **kwargs):

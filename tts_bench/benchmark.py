@@ -55,7 +55,7 @@ class Benchmark:
             print(f"\033[92m{model.__class__.__name__}\033[0m")
             model.load_to_device()
             row = {
-                "model": model.__class__.__name__,
+                "model": model.name,
                 "scores": {},
             }
 
