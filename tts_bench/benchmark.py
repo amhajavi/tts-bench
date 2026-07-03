@@ -57,8 +57,8 @@ class Benchmark:
             "records": [],
         }
         
-        for model in self.models:
-            print(f"\033[92m{model.name}\033[0m")
+        for index, model in enumerate(self.models):
+            print(f"\033[92m{model.name} ({index+1}/{len(self.models)})\033[0m")
             model.load_to_device()
             row = {
                 "model": model.name, # cleaner access in the report templates
@@ -66,8 +66,6 @@ class Benchmark:
                 "scores": {},
                 "instances": {} 
             }
-
-            audio_outputs = []
 
             for index, text in enumerate(tqdm(texts, desc=f"Generating audio for {model.name}")):
                 audio, sr = model.synthesize(
