@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ result.model }} - TTS Model Report</title>
+    <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>📊 {{ result.model }} - TTS Model Report</h1>
+
+        <!-- Metrics Table -->
+        <div class="metrics-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Metric</th>
+                        <th>Score</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for metric in result.metrics %}
+                    <tr>
+                        <td>{{ metric }}</td>
+                        <td class="metric-value">{{ "%.4f"|format(result.scores[metric][0]) }} ± {{ "%.4f"|format(result.scores[metric][1]) }}</td>
+                        <td>Complete</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Audio Files Section -->
+        <div class="audio-section">
+            <h2>🎵 Generated Audio Samples</h2>
+            <div class="audio-cards">
+                {% for index, instance in result.instances.items() %}
+                <div class="audio-card">
+                    <div class="card-header">
+                        <h3>Sample {{ index }}</h3>
+                    </div>
+                    <div class="card-body">
+                        <audio class="audio-player" controls>
+                            <source src="{{ instance.file }}">
+                            Your browser does not support the audio element.
+                        </audio>
+                        <p class="card-text">{{instance.text}}</p>
+                        <div class="card-meta">
+                            <span>Duration: {{ "%.2f"|format(instance.duration) }}s</span>
+                            <span>Quality: {{ instance.sr }}Hz</span>
+                        </div>
+
+                        <table class="instance-metrics">
+                            <thead>
+                                <tr>
+                                    {% for metric in result.metrics %}
+                                    <th>{{ metric }}</th>
+                                    {% endfor %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    {% for metric in result.metrics %}
+                                    <td>{{ "%.4f"|format(instance[metric]) }}</td>
+                                    {% endfor %}
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                {% endfor %}
+
+        <footer class="footer">
+            <p>© 2026 TTS Benchmark Report • Generated with precision and care</p>
+        </footer>
+    </div>
+</body>
+</html>

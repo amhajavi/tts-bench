@@ -5,6 +5,7 @@ from TTS.api import TTS
 
 class VITSWrapper(BaseTTSModel):
     
+    name = "VITS"
     sample_rate = 22050
     
     def __init__(self, **kwargs):

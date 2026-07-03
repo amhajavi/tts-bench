@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TTS Model Report</title>
+    <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>📊 TTS Model Report</h1>
+
+        <!-- Metrics Table -->
+        <div class="metrics-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Metric</th>
+                        {% for model in results.models %}
+                        <th><a href="{{ model_reports[model] }}">{{ model }}</a></th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for metric in results.metrics %}
+                    <tr>
+                        <td>{{ metric }}</td>
+                        {% for model in results.models %}
+                        <td class="metric-value">{{ "%.4f"|format(results.records[loop.index-1].scores[metric][0]) }} ± {{ "%.4f"|format(results.records[loop.index-1].scores[metric][1]) }}</td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <footer class="footer">
+            <p>© 2026 TTS Benchmark Report • Generated with precision and care</p>
+        </footer>
+    </div>
+</body>
+</html>
+
