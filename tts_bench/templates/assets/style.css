@@ -184,3 +184,8 @@
             opacity: 0.8;
             font-size: 0.9rem;
         }
+        
+        table.instance-metrics, table.instance-metrics th, table.instance-metrics td {
+            font-size: 0.85em !important;
+            padding: 10px 5px !important;
+        }
