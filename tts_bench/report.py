@@ -17,24 +17,34 @@ def generate_report(results: list[dict], output_path: str) -> None:
 
     env = Environment(loader=FileSystemLoader(script_path / "templates"))
 
-    if len(results) == 0:
+    if len(results['models']) == 0:
         raise ValueError("No results to generate report.")
-    elif len(results) == 1:
-        template = env.get_template("single_model_report.html")
-        rendered_html = template.render(results=results[0])
-    else:
-        template = env.get_template("comparison_report.html")
-        rendered_html = template.render(results=results)
     
-    # Copy templates/assets folder to output directory
-    output_dir = Path(output_path).parent
-    assets_src = script_path / "templates/assets"
-    assets_dst = output_dir / "assets"
-    if assets_src.exists():
-        if assets_dst.exists():
-            shutil.rmtree(assets_dst)
-        shutil.copytree(assets_src, assets_dst)
+    model_reports = {}
 
-    with open(output_path, "w") as f:
-        f.write(rendered_html)
+    single_template = env.get_template("single_model_report.html")
+    
+    for result in results['records']:
+        single_model_html = single_template.render(result=result)
+        model_name = result['model']
+        output_file = Path(output_path) / f"{model_name}_report.html"
+        with open(output_file, "w") as f:
+            f.write(single_model_html)
+        model_reports.update({model_name: f"{model_name}_report.html"})
+    
+    comparison_template = env.get_template("comparison_report.html")    
+    comparison_html = comparison_template.render(results=results, model_reports=model_reports)
+
+    output_file = Path(output_path) / "index.html"
+    with open(output_file, "w") as f:
+        f.write(comparison_html)
+
+    # Copy style file to output directory
+    output_dir = Path(output_path)
+    assets_src = script_path / "templates/assets/style.css"
+    assets_dst = output_dir / "assets/style.css"
+    if assets_src.exists():
+        assets_dst.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(assets_src, assets_dst)
+
     
