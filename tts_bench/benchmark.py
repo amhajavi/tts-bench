@@ -17,7 +17,7 @@ class Benchmark:
         model_names: list[str],
         metric_names: list[str],
         voice_sample: str = None,
-        demo_output_dir: str = None,
+        output_dir: str = None,
         language: str = "en",
         kokoro_voice_identifier: str = 'af_heart',
         vits_speaker: str = "p225",
@@ -39,7 +39,7 @@ class Benchmark:
         self.models = [registry[n](language=language) for n in tqdm(model_names, desc="Loading the models")]
         self.metrics = [METRICS[n]() for n in metric_names]
         self.voice_sample = voice_sample
-        self.demo_output_dir = Path(demo_output_dir) if demo_output_dir else None
+        self.output_dir = Path(output_dir) if output_dir else None
         self.kokoro_voice_identifier = kokoro_voice_identifier
         self.vits_speaker = vits_speaker
         
@@ -50,42 +50,55 @@ class Benchmark:
         }
 
     def run(self, texts: list[str]) -> list[dict]:
-        results = []
+        
+        results = {
+            "models": [model.name for model in self.models],
+            "metrics": [metric.__class__.__name__ for metric in self.metrics],
+            "records": [],
+        }
+        
         for model in self.models:
-            print(f"\033[92m{model.__class__.__name__}\033[0m")
+            print(f"\033[92m{model.name}\033[0m")
             model.load_to_device()
             row = {
-                "model": model.name,
+                "model": model.name, # cleaner access in the report templates
+                "metrics": [metric.__class__.__name__ for metric in self.metrics], # cleaner access in the report templates
                 "scores": {},
+                "instances": {} 
             }
 
             audio_outputs = []
 
-            for text in tqdm(texts, desc=f"Generating audio for {model.__class__.__name__}"):
+            for index, text in enumerate(tqdm(texts, desc=f"Generating audio for {model.name}")):
                 audio, sr = model.synthesize(
                         text=text,
                         **self.synthesizer_kwargs,
                     )
-                audio_outputs.append((audio, sr, text))
+                
+                row["instances"][index] = {
+                    "text": text,
+                    "sr": sr,
+                    "audio": audio,
+                    "file": str(self._save_audio(audio, sr, model.name, text)).replace(str(self.output_dir), ""),
+                    "duration": float(len(audio) / sr)
+                }
     
-            for metric in tqdm(self.metrics, desc=f"Evaluating metrics for {model.__class__.__name__}"):
+            for metric in tqdm(self.metrics, desc=f"Evaluating metrics for {model.name}"):
                 metric.load_to_device()
                 all_scores = []
-                for index, (audio, sr, text) in enumerate(tqdm(audio_outputs, desc=f"Computing {metric.__class__.__name__} for {model.__class__.__name__}", leave=False)):
+                for index, record in tqdm(row["instances"].items(), desc=f"Computing {metric.__class__.__name__} for {model.name}", leave=False):
+                    audio = record["audio"]
+                    text = record["text"]
+                    sr = record["sr"]
                     score = metric.compute(audio, text, sr=sr, reference=self.voice_sample)
-                    row["scores"].setdefault(metric.__class__.__name__, {}).update({index: score})
-                    score = np.reshape(score, (1,-1,))
-                    all_scores+= [score]
-                row["scores"][metric.__class__.__name__]["all"] = np.mean(all_scores), np.std(all_scores)
+                    row["instances"][index][metric.__class__.__name__] = score
+                    all_scores.append(score)
+                row["scores"][metric.__class__.__name__] = np.mean(all_scores), np.std(all_scores)
 
                 
                 metric.unload_from_device()
-
-            if self.demo_output_dir is not None:
-                for index, (audio, sr, text) in enumerate(tqdm(audio_outputs, desc=f"Saving audio for {model.__class__.__name__}")):
-                    row.setdefault("demo_audio", {}).update({index: str(self._save_audio(audio, sr, model.__class__.__name__, text))})
             model.unload_from_device()
-            results.append(row)
+            results["records"].append(row)
         return results
 
     def _save_audio(self, audio: np.ndarray, sr: int, model_name: str, text: str) -> Path:
@@ -93,7 +106,7 @@ class Benchmark:
         filename = re.sub(r"[^\w\s-]", "", snippet).strip()
         filename = re.sub(r"\s+", "_", filename) or "audio"
 
-        out_dir = self.demo_output_dir / "assets" / model_name
+        out_dir = self.output_dir / "assets" / model_name
         out_dir.mkdir(parents=True, exist_ok=True)
         out_path = out_dir / f"{filename}.wav"
 
