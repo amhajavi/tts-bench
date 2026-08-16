@@ -2,7 +2,7 @@
 
 **A modern, batteries-included evaluation library for open-source and API-based TTS models.**
 
-`tts-bench` lets you evaluate and compare text-to-speech models in minutes — not hours. Point it at one or more models, give it a set of texts, and get back a structured report with audio playback and a comprehensive set of metrics you choose from.
+`tts-bench` is a passion project that may become useful for anyone who wants to evaluate Text-to-Speech models and compare them with each other. There are a few models available right now by default but the beauty of it is that it is very easy to add your model to the mix. It is by no means a complete project and it is still growing. All the contributions are welcome (Please look into CONTRIBUTING.md for the ways to contribute or even just use the tool and give me a feedback on what you would want to see on it).
 
 ```bash
 pip install tts-bench
@@ -12,12 +12,11 @@ pip install tts-bench
 
 ## Why tts-bench?
 
-Evaluating TTS models is surprisingly painful. You either write one-off scripts per model, cobble together separate tools for each metric, or rely on benchmarks that are years out of date. `tts-bench` fixes that:
+Evaluating TTS models is surprisingly painful. You either write one-off scripts per model, cobble together separate tools for each metric, or rely on benchmarks that are years out of date. `tts-bench` is trying to fix that:
 
-- **One interface for all models** — open-source (Kokoro, XTTS, YourTTS, VITS) and API-based (ElevenLabs, OpenAI) share the same evaluation API
-- **Pick your metrics** — choose from a comprehensive library of intelligibility, naturalness, prosody, speaker, and signal metrics
+- **One interface for all models** — open-source (Kokoro, XTTS, YourTTS, VITS) and soon to be added API-based (ElevenLabs, OpenAI) share the same evaluation API. You can even add your own very eaily
+- **Pick your metrics** — choose from a growing library of intelligibility, naturalness, speaker, and signal metrics
 - **Human-readable output** — an HTML report with inline audio playback so you can *hear* the differences, not just read numbers
-- **Reproducible by default** — every run is logged with model versions, inputs, and environment info
 
 ---
 
@@ -26,52 +25,48 @@ Evaluating TTS models is surprisingly painful. You either write one-off scripts 
 ### Evaluate a single model
 
 ```python
-from tts_bench import evaluate
+from tts_bench.benchmark import Benchmark
+from tts_bench.report import generate_report
 
-results = evaluate(
-    model="kokoro",
-    texts=[
-        "The quick brown fox jumps over the lazy dog.",
-        "Call 1-800-555-0199 to speak with an agent.",
-        "Dr. Smith confirmed the diagnosis: type 2 diabetes.",
-    ],
-    metrics=["wer", "utmos", "pitch_rmse"]
+bench = Benchmark(
+    model_names=["kokoro"],
+    metric_names=["wer", "utmos"],
+    output_dir="output",
 )
 
-results.save_report("report.html")
+texts = [
+    "The quick brown fox jumps over the lazy dog.",
+    "Call 1-800-555-0199 to speak with an agent.",
+    "Dr. Smith confirmed the diagnosis: type 2 diabetes.",
+]
+
+results = bench.run(texts)
+generate_report(results, "output")
 ```
 
 ### Compare two models side by side
 
 ```python
-from tts_bench import compare
+from tts_bench.benchmark import Benchmark
+from tts_bench.report import generate_report
 
-report = compare(
-    models=["kokoro", "vits"],
-    texts="my_eval_texts.txt",  # one sentence per line
-    metrics=["wer", "cer", "utmos", "speaker_sim", "stress_pass_rate"]
+bench = Benchmark(
+    model_names=["kokoro", "vits"],
+    metric_names=["wer", "cer", "utmosv2", "speaker_similarity"],
+    output_dir="output",
 )
 
-report.save_report("comparison.html")
-print(report.summary())
-```
+with open("my_eval_texts.txt") as f:
+    texts = [line for line in f.read().splitlines() if line.strip()]
 
-```
-┌──────────────────────┬────────┬────────┐
-│ Metric               │ Kokoro │ VITS   │
-├──────────────────────┼────────┼────────┤
-│ WER ↓                │ 0.031  │ 0.048  │
-│ CER ↓                │ 0.018  │ 0.031  │
-│ UTMOS ↑              │ 4.21   │ 3.87   │
-│ Speaker Sim ↑        │ 0.91   │ 0.84   │
-│ Stress Pass Rate ↑   │ 91%    │ 76%    │
-└──────────────────────┴────────┴────────┘
+results = bench.run(texts)
+generate_report(results, "output")
 ```
 
 ### Run from the command line
 
 ```bash
-tts-bench run --models kokoro vits --metrics wer utmos speaker_sim --input texts.txt --output report.html
+tts-bench run --models kokoro vits --metrics wer utmosv2 speaker_similarity --input texts.txt --output-dir output
 ```
 
 ---
@@ -86,11 +81,11 @@ tts-bench run --models kokoro vits --metrics wer utmos speaker_sim --input texts
 
 These metrics measure whether the model actually says what you asked it to say.
 
-| Key | Metric | What it measures | Reference needed? |
-|---|---|---|---|
-| `wer` | Word Error Rate | Word-level transcription accuracy via Whisper ASR | No |
-| `cer` | Character Error Rate | Character-level transcription accuracy via Whisper ASR | No |
-| `ttscore_int` | TTScore-Int | Reference-free intelligibility via discrete speech token prediction | No |
+| Key | Metric | What it measures | Reference needed? | Status |
+|---|---|---|---|---|
+| `wer` | Word Error Rate | Word-level transcription accuracy via Whisper ASR | No | ✅ |
+| `cer` | Character Error Rate | Character-level transcription accuracy via Whisper ASR | No | ✅ |
+| `ttscore_int` | TTScore-Int | Reference-free intelligibility via discrete speech token prediction | No | 🔜 |
 
 ---
 
@@ -98,14 +93,13 @@ These metrics measure whether the model actually says what you asked it to say.
 
 These metrics estimate how natural and pleasant the speech sounds, without needing human listeners.
 
-| Key | Metric | What it measures | Reference needed? |
-|---|---|---|---|
-| `utmos` | UTMOS | Predicted MOS naturalness score (1–5) | No |
-| `utmos_v2` | UTMOSv2 | Improved MOS predictor, stronger on modern systems | No |
-| `nisqa` | NISQA-MOS | Non-intrusive speech quality assessment | No |
-| `dnsmos` | DNSMOS | Microsoft's non-intrusive MOS predictor | No |
-| `squim_mos` | SQUIM-MOS | Torchaudio's MOS predictor, grounded by non-matching reference | Optional |
-| `ttsds2` | TTSDS2 | Distributional quality score across prosody, speaker, and intelligibility — strongest correlation with human MOS of any automatic metric | No |
+| Key | Metric | What it measures | Reference needed? | Status |
+|---|---|---|---|---|
+| `utmosv2` | UTMOSv2 | Improved MOS predictor, stronger on modern systems | No | ✅ |
+| `dnsmos` | DNSMOS | Microsoft's non-intrusive MOS predictor | No | ✅ |
+| `nisqa` | NISQA-MOS | Non-intrusive speech quality assessment | No | 🔜 |
+| `squim_mos` | SQUIM-MOS | Torchaudio's MOS predictor, grounded by non-matching reference | Optional | 🔜 |
+| `ttsds2` | TTSDS2 | Distributional quality score across prosody, speaker, and intelligibility — strongest correlation with human MOS of any automatic metric | No | 🔜 |
 
 ---
 
@@ -113,13 +107,13 @@ These metrics estimate how natural and pleasant the speech sounds, without needi
 
 These metrics measure the expressiveness, rhythm, and pitch characteristics of the output.
 
-| Key | Metric | What it measures | Reference needed? |
-|---|---|---|---|
-| `pitch_rmse` | F0 RMSE | Pitch contour error vs. reference speech | Yes |
-| `duration_error` | Duration Prediction Error | Phoneme/word duration accuracy vs. reference | Yes |
-| `prosody_diversity` | Prosody Diversity Score | Whether the model produces varied prosody across different inputs (not flat/robotic) | No |
-| `ttscore_pro` | TTScore-Pro | Reference-free prosody evaluation via pitch token prediction | No |
-| `speechbertscore` | SpeechBERTScore | Reference-aware evaluation leveraging NLP-style embedding comparison | Yes |
+| Key | Metric | What it measures | Reference needed? | Status |
+|---|---|---|---|---|
+| `pitch_rmse` | F0 RMSE | Pitch contour error vs. reference speech | Yes | 🔜 |
+| `duration_error` | Duration Prediction Error | Phoneme/word duration accuracy vs. reference | Yes | 🔜 |
+| `prosody_diversity` | Prosody Diversity Score | Whether the model produces varied prosody across different inputs (not flat/robotic) | No | 🔜 |
+| `ttscore_pro` | TTScore-Pro | Reference-free prosody evaluation via pitch token prediction | No | 🔜 |
+| `speechbertscore` | SpeechBERTScore | Reference-aware evaluation leveraging NLP-style embedding comparison | Yes | 🔜 |
 
 ---
 
@@ -127,11 +121,11 @@ These metrics measure the expressiveness, rhythm, and pitch characteristics of t
 
 These metrics are most relevant for voice cloning and zero-shot TTS scenarios.
 
-| Key | Metric | What it measures | Reference needed? |
-|---|---|---|---|
-| `speaker_sim` | Speaker Similarity (ECAPA-TDNN) | Cosine similarity between output and reference speaker embeddings | Yes |
-| `speaker_sim_xvec` | Speaker Similarity (x-vector) | x-vector based speaker similarity | Yes |
-| `speaker_sim_rawnet` | Speaker Similarity (RawNet3) | RawNet3-based speaker similarity | Yes |
+| Key | Metric | What it measures | Reference needed? | Status |
+|---|---|---|---|---|
+| `speaker_similarity` | Speaker Similarity (ECAPA-TDNN) | Cosine similarity between output and reference speaker embeddings | Yes | ✅ |
+| `speaker_sim_xvec` | Speaker Similarity (x-vector) | x-vector based speaker similarity | Yes | 🔜 |
+| `speaker_sim_rawnet` | Speaker Similarity (RawNet3) | RawNet3-based speaker similarity | Yes | 🔜 |
 
 ---
 
@@ -139,62 +133,55 @@ These metrics are most relevant for voice cloning and zero-shot TTS scenarios.
 
 These are classical signal-level metrics, useful for reference-based comparisons or when ground truth audio is available.
 
-| Key | Metric | What it measures | Reference needed? |
-|---|---|---|---|
-| `mcd` | Mel-Cepstral Distortion | Spectral distance between synthetic and reference audio | Yes |
-| `pesq` | PESQ | Perceptual evaluation of speech quality, widely used in telecom | Yes |
-| `stoi` | STOI | Short-time objective intelligibility (0–100%) | Yes |
-| `estoi` | ESTOI | Extended STOI, better for low-intelligibility conditions | Yes |
+| Key | Metric | What it measures | Reference needed? | Status |
+|---|---|---|---|---|
+| `mcd` | Mel-Cepstral Distortion | Spectral distance between synthetic and reference audio | Yes | 🔜 |
+| `pesq` | PESQ | Perceptual evaluation of speech quality, widely used in telecom | Yes | 🔜 |
+| `stoi` | STOI | Short-time objective intelligibility (0–100%) | Yes | 🔜 |
+| `estoi` | ESTOI | Extended STOI, better for low-intelligibility conditions | Yes | 🔜 |
 
 ---
 
 ### Robustness (Stress Testing)
 
-These are not single numeric metrics but pass/fail evaluations across curated stress-test input categories.
-
-| Key | Category | What it tests |
-|---|---|---|
-| `stress_pass_rate` | Overall stress pass rate | Aggregate pass rate across all categories below |
-| `stress_numbers` | Numbers & currency | `"The total is $1,492.50."` |
-| `stress_abbreviations` | Abbreviations & acronyms | `"She has a PhD from MIT."` |
-| `stress_foreign` | Foreign words & names | `"The prix fixe menu features coq au vin."` |
-| `stress_punctuation` | Heavy punctuation | `"Wait — are you serious?! That's... unexpected."` |
-| `stress_long` | Long-form text | 100+ word passages testing consistency over time |
-| `stress_repetition` | Repeated phrases | Inputs that trigger hallucination in LLM-based TTS models |
-| `stress_homophones` | Homophones & ambiguous spelling | `"They're going to their house over there."` |
-
----
-
-### Convenience Bundles
-
-Not sure where to start? Use a pre-defined bundle:
-
-| Bundle | Metrics included |
-|---|---|
-| `"quick"` | `wer`, `utmos` |
-| `"standard"` | `wer`, `cer`, `utmos`, `speaker_sim`, `stress_pass_rate` |
-| `"full"` | All non-reference metrics |
-| `"reference"` | All metrics (requires reference audio) |
-
-```python
-results = evaluate(model="kokoro", texts=my_texts, metrics="standard")
-```
+| Key | Metric | What it measures | Reference needed? | Status |
+|---|---|---|---|---|
+| `stress_pass_rate` | Stress Pass Rate | Aggregate pass rate across the built-in stress suite | No | ✅ |
 
 ---
 
 ## Stress-Test Suite
 
-The built-in stress-test suite is a curated set of inputs that commonly break TTS models in practice. You can use it as-is, extend it, or bring your own:
+The built-in stress-test suite is a curated set of inputs that commonly break TTS models in practice. You can use it as-is, extend it, or bring your own.
+
+| Suite name | Category | Status |
+|---|---|---|
+| `stress_test` | Full stress test | ✅ |
+| `stress_light` | Lightweight stress test | ✅ |
+| `stress_numbers` | Numbers & currency | 🔜 |
+| `stress_abbreviations` | Abbreviations & acronyms | 🔜 |
+| `stress_foreign` | Foreign words & names | 🔜 |
+| `stress_punctuation` | Heavy punctuation | 🔜 |
+| `stress_long` | Long-form text | 🔜 |
+| `stress_repetition` | Repeated phrases | 🔜 |
+| `stress_homophones` | Homophones & ambiguous spelling | 🔜 |
 
 ```python
-from tts_bench import evaluate
-from tts_bench.suites import STRESS_TEST, load_suite
+from tts_bench.benchmark import Benchmark
+from tts_bench.report import generate_report
+from tts_bench.suites import load_suite
 
 # Use the built-in suite
-results = evaluate(model="kokoro", texts=STRESS_TEST, metrics="standard")
+texts = load_suite("stress_test")
 
-# Load your own
-results = evaluate(model="kokoro", texts=load_suite("my_suite.txt"), metrics="standard")
+# Or provide your own text file via --input on the CLI,
+# or read it manually:
+with open("my_suite.txt") as f:
+    texts = [line for line in f.read().splitlines() if line.strip()]
+
+bench = Benchmark(model_names=["kokoro"], metric_names=["wer", "utmosv2"], output_dir="output")
+results = bench.run(texts)
+generate_report(results, "output")
 ```
 
 ---
@@ -239,27 +226,33 @@ class MyCustomModel(BaseTTSModel):
 ### Usage
 
 ```python
-from tts_bench import evaluate, compare
-from my_model import MyCustomModel
+from tts_bench.benchmark import Benchmark
+from tts_bench.report import generate_report
 
 # Evaluate a single custom model
-results = evaluate(
-    model=MyCustomModel(),
-    texts=[
-        "The quick brown fox jumps over the lazy dog.",
-        "She has a PhD from MIT.",
-    ],
-    metrics=["wer", "utmos"]
+bench = Benchmark(
+    model_names=["MyCustomModel"],
+    metric_names=["wer", "utmosv2"],
+    output_dir="output",
+    custom_model_paths=["my_model.py::MyCustomModel"],
 )
-results.save_report("report.html")
+results = bench.run([
+    "The quick brown fox jumps over the lazy dog.",
+    "She has a PhD from MIT.",
+])
+generate_report(results, "output")
 
 # Compare a custom model against a built-in one
-report = compare(
-    models=[MyCustomModel(), "kokoro"],
-    texts="eval_texts.txt",
-    metrics="standard"
+bench = Benchmark(
+    model_names=["MyCustomModel", "kokoro"],
+    metric_names=["wer", "cer", "utmosv2", "speaker_similarity"],
+    output_dir="output",
+    custom_model_paths=["my_model.py::MyCustomModel"],
 )
-print(report.summary())
+with open("eval_texts.txt") as f:
+    texts = [line for line in f.read().splitlines() if line.strip()]
+results = bench.run(texts)
+generate_report(results, "output")
 ```
 
 You can also use a custom model from the CLI with `--custom-model <file>::<ClassName>`:
@@ -268,8 +261,9 @@ You can also use a custom model from the CLI with `--custom-model <file>::<Class
 tts-bench run \
   --custom-model my_model.py::SilentModel \
   --models SilentModel \
-  --metrics wer utmosv2 \
-  --suit stress_test
+  --metrics wer utmos \
+  --suit stress_test \
+  --output-dir output
 ```
 
 `--custom-model` registers the class from the given file, and `--models` then refers to it by class name alongside any built-in model keys.
@@ -293,6 +287,9 @@ tts-bench run \
 | VITS (VCTK) | `vits` | Deterministic, 109 English speakers | ✅ Supported |
 | Parler TTS | `parler` | Prompted style control | 🔜 Coming soon |
 | StyleTTS2 | `styletts2` | High naturalness, style transfer | 🔜 Coming soon |
+| FishAudio | `fish` | Realistic voice cloning | 🔜 Coming soon |
+| CosyVoice | `cosyvoice` | Multilingual, instruction-following TTS | 🔜 Coming soon |
+| IndexTTS | `indextts` | High-fidelity zero-shot voice cloning | 🔜 Coming soon |
 
 XTTS, YourTTS, and VITS are all available via the `coqui-tts` package. Kokoro uses the `kokoro` package.
 
@@ -303,6 +300,7 @@ XTTS, YourTTS, and VITS are all available via the `coqui-tts` package. Kokoro us
 | ElevenLabs | `elevenlabs` | 🔜 Coming soon |
 | OpenAI TTS | `openai` | 🔜 Coming soon |
 | Cartesia | `cartesia` | 🔜 Coming soon |
+| Gemini TTS | `gemini` | 🔜 Coming soon |
 
 Want a model added? [Open an issue](https://github.com/amhajavi/tts-bench/issues).
 
@@ -315,11 +313,13 @@ Requires Python 3.11+.
 ```bash
 pip install tts-bench
 ```
+or 
 
-For local model inference, install with the `local` extra:
 
 ```bash
-pip install tts-bench[local]
+git clone https://github.com/amhajavi/tts-bench.git
+cd tts-bench
+uv sync
 ```
 
 ---
@@ -328,24 +328,17 @@ pip install tts-bench[local]
 
 Contributions are very welcome — especially new model adapters, metrics, and stress-test inputs.
 
-```bash
-git clone https://github.com/amhajavi/tts-bench.git
-cd tts-bench
-uv sync
-uv run pytest
-```
-
 See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 ---
 
 ## Roadmap
 
-- [ ] ElevenLabs and OpenAI TTS adapters
+- [ ] ElevenLabs, Gemini, Cartesia, and OpenAI TTS adapters
 - [ ] Hallucination detection metric (repeated/dropped words)
+- [ ] Automated app builder for subjective scoring
 - [ ] Multilingual stress-test suite
-- [ ] CI benchmark runner (run on every model release)
-- [ ] LLM-as-judge integration for subjective scoring
+- [ ] ... 
 
 ---
 
