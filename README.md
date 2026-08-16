@@ -2,7 +2,7 @@
 
 **A modern, batteries-included evaluation library for open-source and API-based TTS models.**
 
-`tts-bench` is a passion project that may become useful for anyone who wants to evaluate Text-to-Speech models and compare them with each other. There are a few models available right now by default but the beauty of it is that it is very easy to add your model to the mix. It is by no means a complete project and it is still growing. All the contributions are welcome (Please look into CONTRIBUTING.md for the ways to contribute or even just use the tool and give me a feedback on what you would want to see on it).
+`tts-bench` is a passion project that may become useful for anyone who wants to evaluate Text-to-Speech models and compare them with each other. There are a few models available right now by default but the beauty of it is that it is very easy to add your model to the mix. It is by no means a complete project and it is still growing. All the contributions are welcome (Please look into `CONTRIBUTING.md` for the ways to contribute or even just use the tool and give me a feedback on what you would want to see on it).
 
 ```bash
 pip install tts-bench
