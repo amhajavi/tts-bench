@@ -28,15 +28,15 @@ def generate_report(results: list[dict], output_path: str) -> None:
         single_model_html = single_template.render(result=result)
         model_name = result['model']
         output_file = Path(output_path) / f"{model_name}_report.html"
-        with open(output_file, "w") as f:
-            f.write(single_model_html)
+        with open(output_file, "w", encoding='utf-8') as f:
+            f.write(single_model_html, )
         model_reports.update({model_name: f"{model_name}_report.html"})
     
     comparison_template = env.get_template("comparison_report.html")    
     comparison_html = comparison_template.render(results=results, model_reports=model_reports)
 
     output_file = Path(output_path) / "index.html"
-    with open(output_file, "w") as f:
+    with open(output_file, "w", encoding='utf-8') as f:
         f.write(comparison_html)
 
     # Copy style file to output directory
