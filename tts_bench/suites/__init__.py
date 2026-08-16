@@ -3,6 +3,7 @@ from pathlib import Path
 
 BUILTIN_SUITES = {
     "stress_test": Path(__file__).parent / "stress_test.txt",
+    "stress_light": Path(__file__).parent / "stress_light.txt",
 }
 
 
