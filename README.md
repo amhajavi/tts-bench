@@ -8,6 +8,14 @@
 pip install tts-bench
 ```
 
+## Optional Dependencies
+
+Some metrics require packages not available on PyPI and must be installed manually:
+
+| Metric | Package | Install command |
+|---|---|---|
+| `utmos` | UTMOSv2 | `pip install git+https://github.com/sarulab-speech/UTMOSv2.git` |
+
 ---
 
 ## Why tts-bench?
