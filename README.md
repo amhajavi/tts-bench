@@ -8,7 +8,7 @@
 pip install tts-bench
 ```
 
-## Optional Dependencies
+## External Dependencies
 
 Some metrics require packages not available on PyPI and must be installed manually:
 
