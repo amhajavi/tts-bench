@@ -14,7 +14,7 @@ def cli():
 @cli.command()
 def version():
     """Show version."""
-    click.echo("tts-bench-v0.1.0")
+    click.echo("tts-bench-v0.1.1")
 
 
 @cli.command()
